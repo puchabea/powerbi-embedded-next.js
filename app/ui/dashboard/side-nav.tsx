@@ -13,7 +13,7 @@ export default function SideNav() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-full w-64 flex-col border-r border-zinc-200 bg-white p-4">
+    <aside className="flex w-64 shrink-0 flex-col border-r border-zinc-200 bg-white p-4">
       {/* Image */}
       <div className="mb-4 flex justify-center">
         <Image
@@ -23,13 +23,6 @@ export default function SideNav() {
           height={120}
           priority
         />
-      </div>
-      
-      {/* Title box */}
-      <div className="mb-4 bg-sky-200 px-4 py-3">
-        <div className="text-xl font-semibold text-sky-900">
-          Reportes NIC Labs
-        </div>
       </div>
 
       {/* Navigation */}
