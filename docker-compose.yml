@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16
+    container_name: myapp-postgres
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: myapp-web
+    ports:
+      - "3000:3000"
+    environment:
+      # OJO: desde el container "app", la DB se llama "db" (nombre del service)
+      DATABASE_URL: "postgresql://myuser:mypassword@db:5432/mydb"
+      # si usas next dev:
+      NODE_ENV: development
+      WATCHPACK_POLLING: "true"
+      WATCHPACK_POLLING_INTERVAL: "100"
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "200"
+      TURBOPACK: "0"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # para desarrollo: monta tu código dentro del contenedor
+      - .:/app
+      # evita que node_modules se pise entre host y contenedor
+      - node_modules:/app/node_modules
+    command: npm run dev -- -H 0.0.0.0 -p 3000
+
+volumes:
+  pgdata:
+  node_modules:
+

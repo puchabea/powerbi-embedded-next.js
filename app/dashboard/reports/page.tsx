@@ -13,14 +13,14 @@ export default function ReportsPage() {
         Aquí irán los reportes.
       </p>
 
-      <button
-          type="button"
-          className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 transition"
-        >
-          + Agregar reporte
-        </button>
+      <div className="space-y-4">
+      <Link
+        href="/dashboard/reports/new"
+        className="inline-block rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 transition"
+      >
+        + Agregar reporte
+      </Link>
 
-      {/* Lista simple */}
       <ul className="list-disc pl-6">
         <li>
           <Link
@@ -31,6 +31,7 @@ export default function ReportsPage() {
           </Link>
         </li>
       </ul>
+      </div>
     </div>
   );
 }

@@ -5,12 +5,12 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-6">
       <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
         <div className="mb-6 text-center">
+          <h2 className="mb-2 text-3xl font-bold text-zinc-900">
+            Reportes NIC Labs
+          </h2>
           <h1 className="text-2xl font-semibold text-zinc-900">
             Sign in
           </h1>
-          <p className="mt-2 text-sm text-zinc-500">
-            Access the dashboard
-          </p>
         </div>
 
         <form className="space-y-4">
@@ -19,7 +19,7 @@ export default function LoginPage() {
               htmlFor="username"
               className="text-sm font-medium text-zinc-700"
             >
-              Username
+              Username <span className="text-red-500">*</span>
             </label>
             <input
               id="username"
@@ -34,7 +34,7 @@ export default function LoginPage() {
               htmlFor="password"
               className="text-sm font-medium text-zinc-700"
             >
-              Password
+              Password <span className="text-red-500">*</span>
             </label>
             <input
               id="password"
@@ -51,10 +51,6 @@ export default function LoginPage() {
           >
             Sign in
           </Link>
-
-          <p className="text-center text-xs text-zinc-500">
-            UI-only login (no authentication yet)
-          </p>
         </form>
       </div>
     </div>
