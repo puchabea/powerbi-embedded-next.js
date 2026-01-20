@@ -8,6 +8,9 @@ export default function NewReportPage() {
   const [name, setName] = useState("");
   const [embedUrl, setEmbedUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [width, setWidth] = useState(100);
+  const [height, setHeight] = useState(800);
+
 
   async function handleSubmit() {
     setLoading(true);
@@ -15,7 +18,7 @@ export default function NewReportPage() {
     const res = await fetch("/api/reports", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, embedUrl }),
+      body: JSON.stringify({ name, embedUrl, width, height }),
     });
 
     if (res.ok) {
@@ -47,7 +50,31 @@ export default function NewReportPage() {
           onChange={(e) => setEmbedUrl(e.target.value)}
         />
       </div>
+      <div className="grid gap-3 md:grid-cols-2">
+      <div className="space-y-1">
+        <label className="text-sm text-zinc-600">Width (%)</label>
+        <input
+          type="number"
+          min={10}
+          max={100}
+          className="w-full rounded-lg border px-3 py-2"
+          value={width}
+          onChange={(e) => setWidth(Number(e.target.value))}
+        />
+      </div>
 
+      <div className="space-y-1">
+        <label className="text-sm text-zinc-600">Height (px)</label>
+        <input
+          type="number"
+          min={200}
+          max={2000}
+          className="w-full rounded-lg border px-3 py-2"
+          value={height}
+          onChange={(e) => setHeight(Number(e.target.value))}
+        />
+      </div>
+    </div>
       <div className="flex gap-3">
         <button
           onClick={handleSubmit}
