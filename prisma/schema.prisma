@@ -24,6 +24,10 @@ model Report {
   id        String   @id @default(cuid())
   name      String
   embedUrl  String
+
+  width     Int      @default(100) // porcentaje
+  height    Int      @default(800) // px (puedes cambiar default)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
