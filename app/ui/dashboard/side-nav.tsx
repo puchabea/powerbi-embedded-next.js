@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 const links = [
   { name: "Inicio", href: "/dashboard" },
   { name: "Reportes", href: "/dashboard/reports" },
+  { name: "Usuarios", href: "/dashboard/users" },
 ];
 
 export default function SideNav() {
