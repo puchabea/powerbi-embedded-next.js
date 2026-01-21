@@ -10,12 +10,16 @@ export default async function ReportsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Reportes</h1>
-
         <Link
           href="/dashboard/reports/new"
-          className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 transition"
+          className="
+            inline-flex items-center
+            rounded-lg bg-black px-4 py-2 text-sm font-medium text-white
+            hover:brightness-130
+            transition-colors duration-200
+          "
         >
-          + Agregar reporte
+          Agregar reporte
         </Link>
       </div>
 
