@@ -25,8 +25,8 @@ model Report {
   name      String
   embedUrl  String
 
-  width     Int      @default(100) // porcentaje
-  height    Int      @default(800) // px (puedes cambiar default)
+  width     Float    @default(1140) // px
+  height    Float    @default(541)  // px 
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
