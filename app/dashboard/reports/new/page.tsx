@@ -1,5 +1,6 @@
 "use client";
 
+import { Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -19,6 +20,10 @@ export default function NewReportPage() {
   const nameInvalid = touchedName && !name.trim();
   const urlInvalid = touchedUrl && !embedUrl.trim();
 
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [touchedThumb, setTouchedThumb] = useState(false);
+  const thumbInvalid = touchedThumb && !thumbnail;
+
   // Common input styles
   const baseInput = "w-full rounded-lg border px-3 py-2 outline";
   const normal = "border-zinc-300 focus:border-blue-500";
@@ -32,25 +37,31 @@ export default function NewReportPage() {
 
   // Handle form submission
   async function handleSubmit() {
-
     setTouchedName(true);
     setTouchedUrl(true);
-
-    if (!name.trim() || !embedUrl.trim()) return;
+    setTouchedThumb(true);
+    if (!name.trim() || !embedUrl.trim() || !thumbnail) return;
 
     setLoading(true);
 
-    const res = await fetch("/api/reports", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, embedUrl, width, height }),
-    });
+    const fd = new FormData();
+    fd.append("name", name);
+    fd.append("embedUrl", embedUrl);
+    fd.append("width", width);
+    fd.append("height", height);
+    fd.append("thumbnail", thumbnail);
+
+    const res = await fetch("/api/reports", { 
+      method: "POST", 
+      body: fd 
+      });
 
     if (res.ok) {
       router.push("/dashboard/reports");
       router.refresh();
     } else {
-      alert("Error al crear reporte");
+      const j = await res.json().catch(() => null);
+      alert(j?.error ?? "Error al crear reporte");
     }
 
     setLoading(false);
@@ -120,6 +131,49 @@ export default function NewReportPage() {
             }}
           />
         </div>
+
+        <div className="space-y-1">
+          <label className="text-sm text-zinc-600">Foto</label>
+
+          {/* Input real (oculto) */}
+          <input
+            id="thumbnail"
+            type="file"
+            accept="image/*" // limitamos a imágenes, solo UI
+            className="hidden" // lo quitamos del layout
+            onChange={(e) => {
+              setThumbnail(e.target.files?.[0] ?? null); // solo eliges uno y se guarda en el estado
+              setTouchedThumb(true); // marcamos al usuario interactuando
+            }}
+          />
+
+          <label htmlFor="thumbnail"
+            className={`
+              flex cursor-pointer items-center justify-center gap-2
+              rounded-lg border px-4 py-3 text-sm font-medium
+              transition-all duration-200
+              hover:bg-zinc-50 hover:-translate-y-0.5
+              ${thumbInvalid ? "border-red-500 text-red-600" : "border-zinc-300 text-zinc-700"}
+            `}
+          >
+            <Upload className="h-4 w-4" /> 
+            {thumbnail ? "Cambiar foto" : "Agregar foto"}
+          </label>
+
+          {thumbnail && (
+            <p className="text-xs text-zinc-500 truncate">
+              {thumbnail.name}
+            </p>
+          )}
+
+          {thumbInvalid && (
+            <p className="text-sm text-red-500">
+              La foto es obligatoria.
+            </p>
+          )}
+        </div>
+
+
       </div>
       
       <div className="flex gap-3">
