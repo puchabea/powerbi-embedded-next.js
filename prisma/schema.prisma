@@ -28,6 +28,9 @@ model Report {
   width     Float    @default(1140) // px
   height    Float    @default(541)  // px 
 
+  thumbnailData Bytes
+  thumbnailType String 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
