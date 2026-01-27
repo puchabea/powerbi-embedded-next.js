@@ -8,7 +8,7 @@ import {Home, BarChart3, Users} from "lucide-react";
 const links = [
   { name: "Inicio", href: "/dashboard", icon: Home },
   { name: "Reportes", href: "/dashboard/reports", icon: BarChart3 },
-  { name: "Usuarios", href: "/dashboard/users", icon: Users },
+  { name: "Usuarios", href: "/dashboard/admin", icon: Users },
 ];
 
 export default function SideNav() {
