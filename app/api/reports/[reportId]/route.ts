@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { getServerSession } from "next-auth"; // lee la sesión en el servidor
 import { authOptions } from "@/auth";
+import { requireAdmin } from "@/app/lib/admin";
 
 type Awaitable<T> = T | Promise<T>;
 
@@ -65,9 +66,8 @@ export async function DELETE(
   req: Request,
   ctx: { params: Awaitable<{ reportId: string }> }
 ) {
-
-  const session = await getServerSession(authOptions);
-  if (!session) {
+  const auth = await requireAdmin();
+  if (!auth.ok) {
     return NextResponse.json(
       { ok: false, error: "Unauthorized" },
       { status: 401 }
@@ -89,3 +89,4 @@ export async function DELETE(
 
   return NextResponse.json({ ok: true });
 }
+
