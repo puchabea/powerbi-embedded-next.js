@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth";
 
 export async function POST(req: Request) {
-  const badRequest = (error: string) => NextResponse.json({ ok: false, error }, { status: 400 });
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json(
+      { ok: false, error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  const badRequest = (error: string) =>
+    NextResponse.json({ ok: false, error }, { status: 400 });
 
   const form = await req.formData();
 
