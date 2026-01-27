@@ -3,16 +3,24 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {Home, BarChart3, Users} from "lucide-react";
-
-const links = [
-  { name: "Inicio", href: "/dashboard", icon: Home },
-  { name: "Reportes", href: "/dashboard/reports", icon: BarChart3 },
-  { name: "Usuarios", href: "/dashboard/admin", icon: Users },
-];
 
 export default function SideNav() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  const isAdmin = session?.user?.role === "ADMIN";
+
+  const links = [
+    { name: "Inicio", href: "/dashboard", icon: Home },
+    { name: "Reportes", href: "/dashboard/reports", icon: BarChart3 },
+
+    // 👇 solo admins ven Usuarios
+    ...(isAdmin
+      ? [{ name: "Usuarios", href: "/dashboard/admin", icon: Users }]
+      : []),
+  ];
 
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-zinc-200 bg-white p-4">
