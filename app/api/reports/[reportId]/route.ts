@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
+import { getServerSession } from "next-auth"; // lee la sesión en el servidor
+import { authOptions } from "@/auth";
 
 type Awaitable<T> = T | Promise<T>;
 
@@ -7,6 +9,15 @@ export async function PATCH(
   req: Request,
   ctx: { params: Awaitable<{ reportId: string }> }
 ) {
+
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json(
+      { ok: false, error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   const { reportId } = await ctx.params;
 
   if (!reportId) {
@@ -54,6 +65,15 @@ export async function DELETE(
   req: Request,
   ctx: { params: Awaitable<{ reportId: string }> }
 ) {
+
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json(
+      { ok: false, error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   const { reportId } = await ctx.params;
 
   if (!reportId) {
