@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Upload } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 type ReportDTO = {
   id: string;
@@ -11,8 +13,14 @@ type ReportDTO = {
   height: number;
 };
 
-export default function EditReportForm({ initialReport }: { initialReport: ReportDTO }) {
+export default function EditReportForm({
+  initialReport,
+}: {
+  initialReport: ReportDTO;
+}) {
   const router = useRouter();
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "ADMIN";
 
   const [loading, setLoading] = useState(false);
   const [touchedName, setTouchedName] = useState(false);
@@ -28,6 +36,10 @@ export default function EditReportForm({ initialReport }: { initialReport: Repor
   const nameInvalid = touchedName && !name.trim();
   const urlInvalid = touchedUrl && !embedUrl.trim();
 
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [touchedThumb, setTouchedThumb] = useState(false);
+  const thumbInvalid = touchedThumb && !thumbnail;
+
   const baseInput = "w-full rounded-lg border px-3 py-2 outline";
   const normal = "border-zinc-300 focus:border-blue-500";
   const error = "border-red-500 focus:border-blue-500";
@@ -37,8 +49,7 @@ export default function EditReportForm({ initialReport }: { initialReport: Repor
     "hover:-translate-y-0.5 active:translate-y-0 " +
     "disabled:opacity-50 disabled:cursor-not-allowed";
 
-  const dangerButton =
-  `${buttonBase} bg-red-600 text-white hover:bg-red-700`;
+  const dangerButton = `${buttonBase} bg-red-600 text-white hover:bg-red-700`;
 
   async function handleSave() {
     setTouchedName(true);
@@ -49,6 +60,7 @@ export default function EditReportForm({ initialReport }: { initialReport: Repor
 
     setLoading(true);
 
+    // 1) Guardar texto/medidas
     const res = await fetch(`/api/reports/${initialReport.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -63,13 +75,31 @@ export default function EditReportForm({ initialReport }: { initialReport: Repor
       return;
     }
 
+    // 2) Si eligió nueva foto, subirla
+    if (thumbnail) {
+      const fd = new FormData();
+      fd.append("thumbnail", thumbnail);
+
+      const up = await fetch(`/api/reports/${initialReport.id}/thumbnail`, {
+        method: "PATCH",
+        body: fd,
+      });
+
+      if (!up.ok) {
+        const j = await up.json().catch(() => null);
+        setErrorMsg(j?.error ?? "Error al actualizar la foto");
+        setLoading(false);
+        return;
+      }
+    }
+
     router.push(`/dashboard/reports/${initialReport.id}`);
     router.refresh();
   }
 
   async function handleDelete() {
     const ok = confirm(
-      "¿Estás segura de que quieres borrar este reporte?\nEsta acción no se puede deshacer."
+      "¿Estás seguro de que quieres borrar este reporte?\nEsta acción no se puede deshacer."
     );
 
     if (!ok) return;
@@ -90,7 +120,6 @@ export default function EditReportForm({ initialReport }: { initialReport: Repor
     router.refresh();
   }
 
-
   return (
     <div className="max-w-xl space-y-6">
       <h1 className="text-2xl font-semibold">Editar reporte</h1>
@@ -104,7 +133,9 @@ export default function EditReportForm({ initialReport }: { initialReport: Repor
             onChange={(e) => setName(e.target.value)}
             onBlur={() => setTouchedName(true)}
           />
-          {nameInvalid && <p className="text-sm text-red-500">El nombre es obligatorio.</p>}
+          {nameInvalid && (
+            <p className="text-sm text-red-500">El nombre es obligatorio.</p>
+          )}
         </div>
 
         <div className="space-y-1">
@@ -115,7 +146,9 @@ export default function EditReportForm({ initialReport }: { initialReport: Repor
             onChange={(e) => setEmbedUrl(e.target.value)}
             onBlur={() => setTouchedUrl(true)}
           />
-          {urlInvalid && <p className="text-sm text-red-500">La URL es obligatoria.</p>}
+          {urlInvalid && (
+            <p className="text-sm text-red-500">La URL es obligatoria.</p>
+          )}
         </div>
 
         <div className="grid gap-3 md:grid-cols-2">
@@ -146,6 +179,44 @@ export default function EditReportForm({ initialReport }: { initialReport: Repor
           </div>
         </div>
 
+        {/* Foto (sin preview) */}
+        <div className="space-y-1">
+          <label className="text-sm text-zinc-600">Foto</label>
+
+          <input
+            id="thumbnail"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              setThumbnail(e.target.files?.[0] ?? null);
+              setTouchedThumb(true);
+            }}
+          />
+
+          <label
+            htmlFor="thumbnail"
+            className={`
+              flex cursor-pointer items-center justify-center gap-2
+              rounded-lg border px-4 py-3 text-sm font-medium
+              transition-all duration-200
+              hover:bg-zinc-50 hover:-translate-y-0.5
+              ${thumbInvalid ? "border-red-500 text-red-600" : "border-zinc-300 text-zinc-700"}
+            `}
+          >
+            <Upload className="h-4 w-4" />
+            {thumbnail ? "Cambiar foto" : "Editar foto"}
+          </label>
+
+          {thumbnail && (
+            <p className="text-xs text-zinc-500 truncate">{thumbnail.name}</p>
+          )}
+
+          {thumbInvalid && (
+            <p className="text-sm text-red-500">Selecciona una foto.</p>
+          )}
+        </div>
+
         {errorMsg && (
           <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
             {errorMsg}
@@ -169,13 +240,15 @@ export default function EditReportForm({ initialReport }: { initialReport: Repor
             Cancelar
           </button>
 
-          <button
-            onClick={handleDelete}
-            disabled={loading}
-            className={`${dangerButton} ml-auto`}
-          >
-            Borrar reporte
-          </button>
+          {isAdmin && (
+            <button
+              onClick={handleDelete}
+              disabled={loading}
+              className={`${dangerButton} ml-auto`}
+            >
+              Borrar reporte
+            </button>
+          )}
         </div>
       </div>
     </div>
