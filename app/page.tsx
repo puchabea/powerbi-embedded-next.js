@@ -20,7 +20,6 @@ export default function LoginPage() {
     setSubmitted(true);
     setError(null);
 
-    // Validación frontend
     if (!email.trim() || !password.trim()) return;
 
     setLoading(true);
@@ -66,10 +65,10 @@ export default function LoginPage() {
 
       {/* RIGHT – Login */}
       <div className="flex items-center justify-center bg-zinc-50 px-6">
-        <div className="w-full max-w-lg bg-white rounded-2xl border border-zinc-200 p-10 shadow-sm">
+        <div className="w-full max-w-md bg-white rounded-2xl border border-zinc-200 p-8 shadow-sm">
           <div className="mb-6">
             <h2 className="text-2xl font-semibold text-zinc-900">
-              Bienvenido!
+              ¡Bienvenido!
             </h2>
             <p className="mt-1 text-base text-zinc-500">
               Por favor ingresa tus credenciales para continuar.
@@ -146,7 +145,7 @@ export default function LoginPage() {
               className="block w-full rounded-xl bg-sky-600 py-3.5 text-center text-base font-medium
                          text-white hover:bg-sky-700 transition disabled:opacity-60"
             >
-              {loading ? "Entrando..." : "Login Now"}
+              {loading ? "Entrando..." : "Entrar"}
             </button>
           </form>
         </div>
